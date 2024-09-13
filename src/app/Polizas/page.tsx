@@ -45,7 +45,8 @@ const Home = async () => {
     <div className="container mx-auto p-4">
       <div className="flex items-center space-x-4">
         <img src={profile.profileImage} alt={profile.name} className="w-16 h-16 rounded-full" />
-        <h1 className="text-2xl font-bold">{profile.name}</h1>
+        <input type="text" className='block rounded-lg px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"' />
+        <h1 className="text-2xl font-bold ">{profile.name}</h1>
       </div>
       <ul className="mt-4">
         {profile.features.length > 0 ? (
