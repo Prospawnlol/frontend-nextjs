@@ -1,65 +1,74 @@
-import React from 'react';
+"use client";
+import React, { useState } from 'react';
 
-interface Feature {
-  name: string;
-}
+const Home: React.FC = () => {
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-interface UserProfile {
-  name: string;
-  profileImage: string;
-  features: Feature[];
-}
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
 
-const fetchUserProfile = async (): Promise<UserProfile> => {
-  try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/projects`, {
-      cache: 'no-store',
-    });
-    if (!res.ok) {
-      throw new Error(`Failed to fetch user profile: ${res.statusText}`);
-    }
-    const data = await res.json();
-    
-    return {
-      name: data.name || 'Unknown',
-      profileImage: data.profileImage || '',
-      features: data.features || [], // Asegúrate de que 'features' sea un array, incluso si está vacío
+    const formData = {
+      username,
+      email,
+      password,
     };
-  } 
-  catch (error) {
-    console.error('Error fetching user profile:', error);
-    // Maneja el error y proporciona valores predeterminados
-    return { name: 'Unknown', profileImage: '', features: [] };
-  }
-};
 
-const Home = async () => {
-  const profile = await fetchUserProfile();
-  console.log('Profile data:', profile);
+    try {
+      const response = await fetch('http://localhost:3000/users/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
 
-  if (!profile || !Array.isArray(profile.features)) {
-    return <div>Error loading data.</div>;
-  }
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const result = await response.json();
+      console.log('User registered:', result);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="flex items-center space-x-4">
-        <img src={profile.profileImage} alt={profile.name} className="w-16 h-16 rounded-full" />
-        <input type="text" className='block rounded-lg px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"' />
-        <h1 className="text-2xl font-bold ">{profile.name}</h1>
+    <form onSubmit={handleSubmit}>
+      <div>
+        <label htmlFor="username">Username:</label>
+        <input
+          type="text"
+          id="username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          required
+        />
       </div>
-      <ul className="mt-4">
-        {profile.features.length > 0 ? (
-          profile.features.map((feature, index) => (
-            <li key={index} className="bg-gray-100 p-2 rounded-md mb-2">
-              {feature.name}
-            </li>
-          ))
-        ) : (
-          <li>No features available</li>
-        )}
-      </ul>
-    </div>
+      <div>
+        <label htmlFor="email">Email:</label>
+        <input
+          type="email"
+          id="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+      </div>
+      <div>
+        <label htmlFor="password">Password:</label>
+        <input
+          type="password"
+          id="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+      </div>
+      <button type="submit">Register</button>
+    </form>
   );
 };
 
